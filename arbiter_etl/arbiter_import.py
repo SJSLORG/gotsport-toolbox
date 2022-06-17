@@ -2,25 +2,29 @@
 # 1. import schedule
 import pandas as pd
 from time import time
-import numpy
 
 def insert_space(string, integer):
     adjust_retval = string[0:integer] + ' ' + string[integer:]
     return adjust_retval
 
-gs_data = pd.read_excel('etl/data/import/v3.master-schedule.2021-08-28T170118.130-0400.xlsx', sheet_name='Matches')
+root = 'arbiter_etl/data/spring2022/'
+export_file = root + 'export/'
+
+# GotSport Schedule
+gs_data = pd.read_excel('arbiter_etl/data/spring2022/import/a-275-v1.master-schedule.2022-02-06T225309.746-0500.xlsx', sheet_name='Matches')
 gs_data_df = pd.DataFrame(gs_data, columns = ['Date', 'Start Time', 'ID', 'Age', 'Home Team', 'Away Team', 'Venue', 'Pitch'])
 # gs_data_df = pd.DataFrame(gs_data, columns = ['Home Team', 'Away Team', 'Age'])
 
-arbiter_teamsMapping = pd.read_excel('etl/data/lookup/ArbiterMappings.xlsx', sheet_name='TeamsMap', usecols=['GSMAPCONCAT', 'ARBITERMAP'])
+# Arbiter Mapping
+arbiter_teamsMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='TeamsMap', usecols=['GSMAPCONCAT', 'ARBITERMAP'])
 arbiter_teamsMapping_dict = arbiter_teamsMapping.set_index('GSMAPCONCAT')['ARBITERMAP'].to_dict()
 gs_data_df = gs_data_df.replace(arbiter_teamsMapping_dict)
 
-arbiter_levelsMapping = pd.read_excel('etl/data/lookup/ArbiterMappings.xlsx', sheet_name='LevelsMap', usecols=['AgeMap', 'LevelMap'])
+arbiter_levelsMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='LevelsMap', usecols=['AgeMap', 'LevelMap'])
 arbiter_levelsMapping_dict = arbiter_levelsMapping.set_index('AgeMap')['LevelMap'].to_dict()
 gs_data_df = gs_data_df.replace(arbiter_levelsMapping_dict)
 
-arbiter_sitesMapping = pd.read_excel('etl/data/lookup/ArbiterMappings.xlsx', sheet_name='SitesMap', usecols=['GSVENUEMAP', 'ARBITERSITEMAP'])
+arbiter_sitesMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='SitesMap', usecols=['GSVENUEMAP', 'ARBITERSITEMAP'])
 
 gs_data_df = pd.merge(gs_data_df, arbiter_sitesMapping, how='left', left_on=['Venue'], right_on = ['GSVENUEMAP'])
 
@@ -29,7 +33,7 @@ gs_data_df = pd.merge(gs_data_df, arbiter_sitesMapping, how='left', left_on=['Ve
 
 # new_df = pd.merge(A_df, B_df,  how='left', left_on=['A_c1','c2'], right_on = ['B_c1','c2'])
 
-arbiter_subsitesMapping = pd.read_excel('etl/data/lookup/ArbiterMappings.xlsx', sheet_name='SubsitesMap', usecols=['ARBITERSITEMAP', 'GSSUBSITEMAP', 'ARBITERSUBSITEMAP'])
+arbiter_subsitesMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='SubsitesMap', usecols=['ARBITERSITEMAP', 'GSSUBSITEMAP', 'ARBITERSUBSITEMAP'])
 arbiter_subsitesMapping = arbiter_subsitesMapping.set_index(['ARBITERSITEMAP', 'GSSUBSITEMAP'])
 arbiter_subsitesMapping = arbiter_subsitesMapping.loc[arbiter_subsitesMapping.index.dropna()]
 
@@ -85,5 +89,5 @@ print (gs_data_df)
 
 # now = datetime.now() # current date and time
 
-gs_data_df.to_csv('etl/data/export/ArbiterImport.' + str(time()*1000) + '.csv', index = False, header=True)
+gs_data_df.to_csv(export_file + 'ArbiterImport.' + str(time()*1000) + '.csv', index = False, header=True)
 
