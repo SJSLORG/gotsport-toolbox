@@ -7,11 +7,12 @@ def insert_space(string, integer):
     adjust_retval = string[0:integer] + ' ' + string[integer:]
     return adjust_retval
 
-root = 'arbiter_etl/data/spring2022/'
+root = 'arbiter_etl/data/fall2022/'
 export_file = root + 'export/'
+import_file = root + 'import/'
 
 # GotSport Schedule
-gs_data = pd.read_excel('arbiter_etl/data/spring2022/import/a-275-v1.master-schedule.2022-02-06T225309.746-0500.xlsx', sheet_name='Matches')
+gs_data = pd.read_excel(import_file + 'MasterSchedule.xlsx', sheet_name='Matches')
 gs_data_df = pd.DataFrame(gs_data, columns = ['Date', 'Start Time', 'ID', 'Age', 'Home Team', 'Away Team', 'Venue', 'Pitch'])
 # gs_data_df = pd.DataFrame(gs_data, columns = ['Home Team', 'Away Team', 'Age'])
 
@@ -46,10 +47,10 @@ print(gs_data_df)
 
 gs_data_df['Partner'] = 'GotSport'
 gs_data_df['Sport'] = 'Soccer'
-gs_data_df['Game ID'] = ''
+gs_data_df['Custom Game ID'] = ''
 gs_data_df['BillTo'] = ''
 
-gs_data_df['Start Time'] = gs_data_df['Start Time'].apply(lambda x: insert_space(x, 5) )
+# gs_data_df['Start Time'] = gs_data_df['Start Time'].apply(lambda x: insert_space(x, 5) )
 
 # gotsport export columns
 #     ID	Match Number	Round	Date	Start Time	End Time	Venue	Venue State	Pitch	Home Club	Home Team	Home Score	Away Club	Away Team	Away Score	Status	Age	Gender	Division	Broadcaster	Time Slot ID
@@ -59,7 +60,7 @@ gs_data_df['Start Time'] = gs_data_df['Start Time'].apply(lambda x: insert_space
 # mapping
 #     Date -> Date
 #     Time -> Start Time
-#     Game ID -> BLANK
+#     Game ID -> ID
 #     Custom Game ID -> ID
 #     Partner -> GotSport
 #     Sport -> Soccer
@@ -74,7 +75,8 @@ gs_data_df['Start Time'] = gs_data_df['Start Time'].apply(lambda x: insert_space
 
 
 gs_data_df = gs_data_df.rename(columns={
-    'ID': 'Custom Game ID', 
+    'ID': 'Game ID',
+    # 'ID': 'Custom Game ID', 
     'Start Time': 'Time', 
     'Age': 'Level', 
     'ARBITERSITEMAP' : 'Site', 
