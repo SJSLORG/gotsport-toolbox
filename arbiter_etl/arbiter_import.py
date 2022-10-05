@@ -12,14 +12,31 @@ export_file = root + 'export/'
 import_file = root + 'import/'
 
 # GotSport Schedule
-gs_data = pd.read_excel(import_file + 'MasterSchedule.xlsx', sheet_name='Matches')
-gs_data_df = pd.DataFrame(gs_data, columns = ['Date', 'Start Time', 'ID', 'Age', 'Home Team', 'Away Team', 'Venue', 'Pitch'])
+gs_data = pd.read_excel(import_file + 'a-v1.master-schedule.2022-10-03T170457.354-0400.xlsx', sheet_name='Matches')
+gs_data_df = pd.DataFrame(gs_data, columns = ['Date', 'Start Time', 'ID', 'Age', 'Home Club', 'Home Team', 'Away Club', 'Away Team', 'Venue', 'Pitch'])
 # gs_data_df = pd.DataFrame(gs_data, columns = ['Home Team', 'Away Team', 'Age'])
 
 # Arbiter Mapping
-arbiter_teamsMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='TeamsMap', usecols=['GSMAPCONCAT', 'ARBITERMAP'])
-arbiter_teamsMapping_dict = arbiter_teamsMapping.set_index('GSMAPCONCAT')['ARBITERMAP'].to_dict()
-gs_data_df = gs_data_df.replace(arbiter_teamsMapping_dict)
+# arbiter_teamsMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='TeamsMap', usecols=['GSMAPCONCAT', 'ARBITERMAP'])
+# arbiter_teamsMapping_dict = arbiter_teamsMapping.set_index('GSMAPCONCAT')['ARBITERMAP'].to_dict()
+# gs_data_df = gs_data_df.replace(arbiter_teamsMapping_dict)
+
+
+# df.apply(lambda x: x['a'].replace('a',x['b']), axis=1)
+
+# gs_data_df.apply(lambda x: x['Home Team'].replace('Home Team', x['Home Club']), axis=1)
+# gs_data_df.apply(lambda x: x['Away Team'].replace('Away Team', x['Away Club']), axis=1)
+
+gs_data_df['Away Team'] = gs_data_df['Away Team'].replace(gs_data_df['Away Club'].tolist(), '', regex=True, limit=1)
+gs_data_df['Home Team'] = gs_data_df['Home Team'].replace(gs_data_df['Home Club'].tolist(), '', regex=True, limit=1)
+
+
+gs_data_df['Away Team'] = gs_data_df['Away Club'] + gs_data_df['Away Team'].str[1:]
+gs_data_df['Home Team'] = gs_data_df['Home Club'] + gs_data_df['Home Team'].str[1:]
+
+# gs_data_df['Home Team'] = gs_data_df['Home Team'].str.replace(gs_data_df['Home Club'].str, '')
+gs_data_df['Home Team'] = gs_data_df['Home Team'].str.upper()
+gs_data_df['Away Team'] = gs_data_df['Away Team'].str.upper()
 
 arbiter_levelsMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='LevelsMap', usecols=['AgeMap', 'LevelMap'])
 arbiter_levelsMapping_dict = arbiter_levelsMapping.set_index('AgeMap')['LevelMap'].to_dict()
@@ -90,6 +107,5 @@ gs_data_df = gs_data_df[[ 'Date', 'Time', 'Game ID', 'Custom Game ID', 'Partner'
 print (gs_data_df)
 
 # now = datetime.now() # current date and time
-
 gs_data_df.to_csv(export_file + 'ArbiterImport.' + str(time()*1000) + '.csv', index = False, header=True)
 
