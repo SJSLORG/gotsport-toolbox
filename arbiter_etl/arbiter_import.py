@@ -7,12 +7,16 @@ def insert_space(string, integer):
     adjust_retval = string[0:integer] + ' ' + string[integer:]
     return adjust_retval
 
-root = 'arbiter_etl/data/fall2022/'
+root = 'arbiter_etl/data/spring2023/'
 export_file = root + 'export/'
 import_file = root + 'import/'
 
 # GotSport Schedule
-gs_data = pd.read_excel(import_file + 'a-v1.master-schedule.2022-10-03T170457.354-0400.xlsx', sheet_name='Matches')
+# /Users/roxberry/Workspaces/SJSL/gotsport-toolbox/arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-02-14T164713.169-0500.xlsx
+# /Users/roxberry/Workspaces/SJSL/gotsport-toolbox/arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-03-10T152917.670-0500.xlsx
+# arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-04-16T221609.437-0400.xlsx
+# /Users/roxberry/Workspaces/SJSL/gotsport-toolbox/arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-05-06T102222.914-0400.xlsx
+gs_data = pd.read_excel(import_file + 'a-v2023-01-27.master-schedule.2023-05-06T102222.914-0400.xlsx', sheet_name='Matches')
 gs_data_df = pd.DataFrame(gs_data, columns = ['Date', 'Start Time', 'ID', 'Age', 'Home Club', 'Home Team', 'Away Club', 'Away Team', 'Venue', 'Pitch'])
 # gs_data_df = pd.DataFrame(gs_data, columns = ['Home Team', 'Away Team', 'Age'])
 
@@ -31,8 +35,8 @@ gs_data_df['Away Team'] = gs_data_df['Away Team'].replace(gs_data_df['Away Club'
 gs_data_df['Home Team'] = gs_data_df['Home Team'].replace(gs_data_df['Home Club'].tolist(), '', regex=True, limit=1)
 
 
-gs_data_df['Away Team'] = gs_data_df['Away Club'] + gs_data_df['Away Team'].str[1:]
-gs_data_df['Home Team'] = gs_data_df['Home Club'] + gs_data_df['Home Team'].str[1:]
+gs_data_df['Away Team'] = gs_data_df['Away Club'] + ' ' + gs_data_df['Away Team'].str[1:]
+gs_data_df['Home Team'] = gs_data_df['Home Club'] + ' ' + gs_data_df['Home Team'].str[1:]
 
 # gs_data_df['Home Team'] = gs_data_df['Home Team'].str.replace(gs_data_df['Home Club'].str, '')
 gs_data_df['Home Team'] = gs_data_df['Home Team'].str.upper()
