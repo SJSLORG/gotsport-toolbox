@@ -7,16 +7,15 @@ def insert_space(string, integer):
     adjust_retval = string[0:integer] + ' ' + string[integer:]
     return adjust_retval
 
-root = 'arbiter_etl/data/spring2023/'
+root = 'arbiter_etl/data/fall2023/'
 export_file = root + 'export/'
-import_file = root + 'import/'
-
+import_file_folder = root + 'import/'
+import_file_name = 'a-v1.master-schedule.2023-10-22T202147.703-0400.xlsx'
+# import_file_path = 'arbiter_etl/data/fall2023/import/a-v1.master-schedule.2023-10-22T202147.703-0400.xlsx'
 # GotSport Schedule
-# /Users/roxberry/Workspaces/SJSL/gotsport-toolbox/arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-02-14T164713.169-0500.xlsx
-# /Users/roxberry/Workspaces/SJSL/gotsport-toolbox/arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-03-10T152917.670-0500.xlsx
-# arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-04-16T221609.437-0400.xlsx
-# /Users/roxberry/Workspaces/SJSL/gotsport-toolbox/arbiter_etl/data/spring2023/import/a-v2023-01-27.master-schedule.2023-05-06T102222.914-0400.xlsx
-gs_data = pd.read_excel(import_file + 'a-v2023-01-27.master-schedule.2023-05-06T102222.914-0400.xlsx', sheet_name='Matches')
+# import_file_full = 'data/fall2023/import/a-v1.master-schedule.2023-08-15T203222.530-0400.xlsx'
+gs_data = pd.read_excel(import_file_folder  +  import_file_name, sheet_name='Matches')
+# gs_data = pd.read_excel(import_file_full, sheet_name='Matches')
 gs_data_df = pd.DataFrame(gs_data, columns = ['Date', 'Start Time', 'ID', 'Age', 'Home Club', 'Home Team', 'Away Club', 'Away Team', 'Venue', 'Pitch'])
 # gs_data_df = pd.DataFrame(gs_data, columns = ['Home Team', 'Away Team', 'Age'])
 
@@ -112,4 +111,5 @@ print (gs_data_df)
 
 # now = datetime.now() # current date and time
 gs_data_df.to_csv(export_file + 'ArbiterImport.' + str(time()*1000) + '.csv', index = False, header=True)
+# gs_data_df.to_csv( 'export/ArbiterImport.' + str(time()*1000) + '.csv', index = False, header=True)
 
