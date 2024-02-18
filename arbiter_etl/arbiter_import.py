@@ -3,14 +3,29 @@
 import pandas as pd
 from time import time
 
+def custom_replace(row, prefix):
+    club_key = f'{prefix} Club'
+    team_key = f'{prefix} Team'
+    first_club = row[club_key][:5]
+    starts_with_club = row[team_key].strip().startswith(first_club)
+
+    if starts_with_club:
+        result = row[team_key].strip()
+    else:
+        result = row[club_key].strip() + ' ' + row[team_key].strip()  # No change if the first 10 letters don't match
+
+    return result
+
+
+    
 def insert_space(string, integer):
     adjust_retval = string[0:integer] + ' ' + string[integer:]
     return adjust_retval
 
-root = 'arbiter_etl/data/fall2023/'
+root = 'arbiter_etl/data/spring2024/'
 export_file = root + 'export/'
 import_file_folder = root + 'import/'
-import_file_name = 'a-v1.master-schedule.2023-10-22T202147.703-0400.xlsx'
+import_file_name = '2024-03-final-2-7-24.master-schedule.2024-02-18T133800.215-0500.xlsx'
 # import_file_path = 'arbiter_etl/data/fall2023/import/a-v1.master-schedule.2023-10-22T202147.703-0400.xlsx'
 # GotSport Schedule
 # import_file_full = 'data/fall2023/import/a-v1.master-schedule.2023-08-15T203222.530-0400.xlsx'
@@ -19,27 +34,19 @@ gs_data = pd.read_excel(import_file_folder  +  import_file_name, sheet_name='Mat
 gs_data_df = pd.DataFrame(gs_data, columns = ['Date', 'Start Time', 'ID', 'Age', 'Home Club', 'Home Team', 'Away Club', 'Away Team', 'Venue', 'Pitch'])
 # gs_data_df = pd.DataFrame(gs_data, columns = ['Home Team', 'Away Team', 'Age'])
 
-# Arbiter Mapping
-# arbiter_teamsMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='TeamsMap', usecols=['GSMAPCONCAT', 'ARBITERMAP'])
-# arbiter_teamsMapping_dict = arbiter_teamsMapping.set_index('GSMAPCONCAT')['ARBITERMAP'].to_dict()
-# gs_data_df = gs_data_df.replace(arbiter_teamsMapping_dict)
-
-
-# df.apply(lambda x: x['a'].replace('a',x['b']), axis=1)
-
-# gs_data_df.apply(lambda x: x['Home Team'].replace('Home Team', x['Home Club']), axis=1)
-# gs_data_df.apply(lambda x: x['Away Team'].replace('Away Team', x['Away Club']), axis=1)
-
 gs_data_df['Away Team'] = gs_data_df['Away Team'].replace(gs_data_df['Away Club'].tolist(), '', regex=True, limit=1)
 gs_data_df['Home Team'] = gs_data_df['Home Team'].replace(gs_data_df['Home Club'].tolist(), '', regex=True, limit=1)
 
+# gs_data_df['Away Team'] = gs_data_df['Away Club'] + ' ' + gs_data_df['Away Team'].str[1:]
+# gs_data_df['Home Team'] = gs_data_df['Home Club'] + ' ' + gs_data_df['Home Team'].str[1:]
 
-gs_data_df['Away Team'] = gs_data_df['Away Club'] + ' ' + gs_data_df['Away Team'].str[1:]
-gs_data_df['Home Team'] = gs_data_df['Home Club'] + ' ' + gs_data_df['Home Team'].str[1:]
+gs_data_df['Home Team'] = gs_data_df.apply(custom_replace, prefix='Home', axis=1)
+gs_data_df['Away Team'] = gs_data_df.apply(custom_replace, prefix='Away', axis=1)
 
 # gs_data_df['Home Team'] = gs_data_df['Home Team'].str.replace(gs_data_df['Home Club'].str, '')
 gs_data_df['Home Team'] = gs_data_df['Home Team'].str.upper()
 gs_data_df['Away Team'] = gs_data_df['Away Team'].str.upper()
+
 
 arbiter_levelsMapping = pd.read_excel(root + 'lookup/ArbiterMappings.xlsx', sheet_name='LevelsMap', usecols=['AgeMap', 'LevelMap'])
 arbiter_levelsMapping_dict = arbiter_levelsMapping.set_index('AgeMap')['LevelMap'].to_dict()
