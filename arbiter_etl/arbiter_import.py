@@ -15,8 +15,6 @@ def custom_replace(row, prefix):
         result = row[club_key].strip() + ' ' + row[team_key].strip()  # No change if the first 10 letters don't match
 
     return result
-
-
     
 def insert_space(string, integer):
     adjust_retval = string[0:integer] + ' ' + string[integer:]
@@ -25,7 +23,7 @@ def insert_space(string, integer):
 root = 'arbiter_etl/data/spring2024/'
 export_file = root + 'export/'
 import_file_folder = root + 'import/'
-import_file_name = '2024-03-final-2-7-24.master-schedule.2024-02-18T133800.215-0500.xlsx'
+import_file_name = '2024-05-final-2-7-24.master-schedule.2024-04-29T153711.951-0400.xlsx'
 # import_file_path = 'arbiter_etl/data/fall2023/import/a-v1.master-schedule.2023-10-22T202147.703-0400.xlsx'
 # GotSport Schedule
 # import_file_full = 'data/fall2023/import/a-v1.master-schedule.2023-08-15T203222.530-0400.xlsx'
